@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simplified CGPA Calculator</title>
+    <style>
+      :root {
+        /* Changed from Blue to Teal */
+        --primary: #00796b;
+        --secondary: #e0f2f1;
+        --text: #333;
+        --border: #b2dfdb;
+        --bg: #f4f4f4;
+        --white: #fff;
+        --danger: #d32f2f;
+      }
+
+      * {
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: var(--bg);
+        color: var(--text);
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .container {
+        max-width: 700px;
+        width: 100%;
+        background: var(--white);
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+        border-top: 5px solid var(--primary);
+      }
+
+      h1 {
+        text-align: center;
+        color: var(--primary);
+        margin-bottom: 10px;
+      }
+      p.subtitle {
+        text-align: center;
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 30px;
+      }
+
+      .icon {
+        width: 1.2em;
+        height: 1.2em;
+        vertical-align: middle;
+        fill: currentColor;
+      }
+
+      .year-block {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        margin-bottom: 20px;
+        background-color: var(--white);
+        overflow: hidden;
+      }
+
+      .year-header {
+        background-color: var(--secondary);
+        padding: 12px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: bold;
+        color: var(--primary);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .delete-btn {
+        background: none;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        padding: 5px;
+      }
+
+      .semesters-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        padding: 20px;
+      }
+
+      @media (max-width: 500px) {
+        .semesters-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .semester-group h3 {
+        font-size: 0.9rem;
+        margin: 0 0 8px 0;
+        color: #555;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1.1rem;
+        text-align: center;
+      }
+      .input-group input:focus {
+        outline: 2px solid var(--primary);
+        border-color: transparent;
+      }
+
+      /* Year Result Display */
+      .year-result {
+        background-color: #fafafa;
+        padding: 10px 20px;
+        border-top: 1px solid var(--border);
+        text-align: right;
+        font-size: 0.9rem;
+        color: #555;
+      }
+      .year-result span {
+        font-weight: bold;
+        color: var(--text);
+      }
+
+      /* Actions */
+      .actions {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        justify-content: center;
+      }
+
+      button.btn-primary,
+      button.btn-outline {
+        padding: 12px 24px;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      button.btn-primary {
+        background-color: var(--primary);
+        color: var(--white);
+        border: none;
+      }
+
+      button.btn-outline {
+        background-color: transparent;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+      }
+
+      button:hover {
+        opacity: 0.9;
+      }
+
+      /* Grand Total Result */
+      .grand-result {
+        background-color: var(--text);
+        color: var(--white);
+        padding: 25px;
+        border-radius: 6px;
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .grand-result h2 {
+        margin: 0 0 5px 0;
+        font-size: 3rem;
+        color: var(--primary);
+      }
+      .grand-result h2 span {
+        color: var(--white);
+        font-size: 1rem;
+        vertical-align: middle;
+      }
+      .grand-result .class-degree {
+        font-size: 1.1rem;
+        color: #bbb;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>
+        <svg class="icon" viewBox="0 0 24 24">
+          <path
+            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1v5h5c.55 0 1 .45 1 1s-.45 1-1 1h-5v5c0 .55-.45 1-1 1s-1-.45-1-1v-5H6c-.55 0-1-.45-1-1s.45-1 1-1h5V4c0-.55.45-1 1-1z"
+          />
+        </svg>
+        Simplified CGPA Calc
+      </h1>
+      <p class="subtitle">
+        Enter your GPA for each semester. Leave blank if you haven't seen the
+        result yet.
+      </p>
+
+      <div id="yearsContainer"></div>
+
+      <div class="actions">
+        <button class="btn-outline" onclick="addYear()">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path
+              d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+            />
+          </svg>
+          Add Year
+        </button>
+        <button class="btn-primary" onclick="calculateAll()">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+          </svg>
+          Calculate CGPA
+        </button>
+      </div>
+
+      <div class="grand-result" id="grandResult" style="display: none">
+        <h2 id="finalCgpa">0.00</h2>
+        <div class="class-degree" id="degreeClass">Second Class Upper</div>
+      </div>
+    </div>
+
+    <script>
+      let yearCount = 0;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        addYear();
+      });
+
+      function addYear() {
+        yearCount++;
+        const container = document.getElementById("yearsContainer");
+
+        const yearHTML = `
+            <div class="year-block" id="year-${yearCount}">
+                <div class="year-header">
+                    <span>Year ${yearCount}</span>
+                    ${
+                      yearCount > 1
+                        ? `<button class="delete-btn" onclick="removeYear(${yearCount})" title="Remove"><svg class="icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>`
+                        : ""
+                    }
+                </div>
+                <div class="semesters-grid">
+                    <div class="semester-group">
+                        <h3>1st Semester GPA</h3>
+                        <div class="input-group">
+                            <input type="number" step="0.01" min="0" max="5.0" class="sem-gpa" placeholder="0.00">
+                        </div>
+                    </div>
+                    <div class="semester-group">
+                        <h3>2nd Semester GPA</h3>
+                        <div class="input-group">
+                            <input type="number" step="0.01" min="0" max="5.0" class="sem-gpa" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+                <div class="year-result">
+                    Year Average: <span class="year-avg-display">0.00</span>
+                </div>
+            </div>
+        `;
+
+        container.insertAdjacentHTML("beforeend", yearHTML);
+      }
+
+      function removeYear(id) {
+        const element = document.getElementById(`year-${id}`);
+        if (element) element.remove();
+        calculateAll();
+      }
+
+      function calculateAll() {
+        let grandTotalGpa = 0;
+        let totalSemestersCounted = 0;
+
+        const years = document.querySelectorAll(".year-block");
+
+        years.forEach((year) => {
+          const gpaInputs = year.querySelectorAll(".sem-gpa");
+          let yearTotal = 0;
+          let semCount = 0;
+
+          // Loop through inputs
+          gpaInputs.forEach((input) => {
+            const val = parseFloat(input.value);
+            if (!isNaN(val)) {
+              yearTotal += val;
+              semCount++;
+            }
+          });
+
+          // Update Year Display
+          const yearDisplay = year.querySelector(".year-avg-display");
+          if (semCount > 0) {
+            const yearAvg = yearTotal / semCount;
+            yearDisplay.textContent = yearAvg.toFixed(2);
+
+            // Add to Grand Total
+            grandTotalGpa += yearTotal; // Add sum of GPAs
+            totalSemestersCounted += semCount; // Add count of semesters
+          } else {
+            yearDisplay.textContent = "0.00";
+          }
+        });
+
+        // Display Final Results
+        const resultBox = document.getElementById("grandResult");
+        const finalCgpaEl = document.getElementById("finalCgpa");
+        const degreeClassEl = document.getElementById("degreeClass");
+
+        if (totalSemestersCounted > 0) {
+          // Simple Average Calculation: Sum of all GPAs / Number of Semesters
+          const cgpa = grandTotalGpa / totalSemestersCounted;
+
+          finalCgpaEl.textContent = cgpa.toFixed(2);
+          degreeClassEl.textContent = getDegreeClass(cgpa);
+          resultBox.style.display = "block";
+          resultBox.scrollIntoView({ behavior: "smooth" });
+        } else {
+          resultBox.style.display = "none";
+          alert("Please enter a valid GPA for at least one semester.");
+        }
+      }
+
+      function getDegreeClass(cgpa) {
+        if (cgpa >= 4.5) return "First Class Honours";
+        if (cgpa >= 3.5) return "Second Class Upper (2:1)";
+        if (cgpa >= 2.4) return "Second Class Lower (2:2)";
+        if (cgpa >= 1.5) return "Third Class";
+        if (cgpa >= 1.0) return "Pass";
+        return "Probation / Fail";
+      }
+    </script>
+  </body>
+</html>
